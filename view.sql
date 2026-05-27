@@ -1,4 +1,4 @@
-use _S22100229_DB;
+use Team25;
 
 -- view 1. user count (done)
 create view original_user_count as
@@ -29,12 +29,13 @@ select *
 from doc_count;
 
 -- view 3. term_count_3rd todo: 문제 이해하기
--- show the term that has the third-highest number of occurrence and the number of occurrence of that term
-select term, count(*) as occurrences
-from Problem26.allrecords where term is not null group by term
-order by occurrences desc;
+# show the term that has the third-highest number of occurrence
+# and the number of occurrence of that term
 
-
+create view term_count_3rd as
+select term, `count`
+from keywords join Team25.keywords_dict kd on kd.id = keywords.term_id
+order by `count` desc limit 1 offset 2;
 
 
 -- 4. view: count_doc_title (done)
@@ -52,7 +53,14 @@ select *
 from count_doc_title;
 
 -- 5. view: saved_documents
--- Display the user id, saved hash key, saved date of the document, stored in ascending order by saved date
+-- Display the user id, saved hash key, saved date of the document,
+# stored in ascending order by saved date
+create view saved_documents as
+(
+select user_id, has_key, saved_date
+from saved_doc
+order by saved_date
+);
 
 
 # 6. view: user_inst_2nd
@@ -87,6 +95,22 @@ from user_inst_2nd;
 # 7. view: document_summary
 # Show the attached document information by summarizing
 # their hash key, title, timestamp stored in ascending order by timestamp
+
+with original_summary as (
+    select distinct
+        hash_key, doc_title,
+        STR_TO_DATE(post_date, '%Y-%m-%d %h:%i:%s %p') as `timestamp` , post_date
+        from Problem26.allrecords where hash_key is not null
+        order by `timestamp`
+)
+select o.hash_key, ds.has_key, o.doc_title, ds.doc_title,
+       o.post_date, ds.post_date, o.post_date
+from document_summary ds
+left join original_summary o on o.hash_key <=> ds.has_key
+order by ds.post_date
+;
+
+
 create view document_summary as
 (
 select has_key, doc_title, post_date
@@ -101,4 +125,12 @@ from document_summary;
 # Show the records for faq by summarizing
 # user_id, qna_title, qna_content, status, reply date
 # in descending order by reply date
+create view qna_records as
+(select q.user_id, q.title, q.content, st.status, reply_date
+from qna q
+join status_info st on q.status = st.id
+left join reply on q.id = reply.qna_id
+order by reply.reply_date desc);
 
+select distinct qna_user_id, qna_title, qna_content, status, reply_date
+from Problem26.allrecords where qna_user_id is not null order by  reply_date desc;

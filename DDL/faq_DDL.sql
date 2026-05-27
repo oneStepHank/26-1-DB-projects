@@ -1,4 +1,4 @@
-use _S22100229_DB;
+use Team25;
 
 create table faq(
     faq_id                tinyint      primary key ,

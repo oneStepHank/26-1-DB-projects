@@ -1,4 +1,11 @@
-use _S22100229_DB;
+# use _S22100229_DB;
+
+use Team25;
+
+create table status_info(
+                            id tinyint primary key,
+                            status varchar(8) not null default 'open'
+);
 
 create table qna(
     id smallint primary key,
@@ -11,11 +18,6 @@ create table qna(
 
     foreign key (user_id) references user(id),
     foreign key (status) references  status_info(id)
-);
-
-create table status_info(
-    id tinyint primary key,
-    status varchar(10) not null default 'open'
 );
 
 create table reply(
@@ -44,6 +46,10 @@ from Problem26.allrecords a
 join status_info s_info on a.status = s_info.status
 where a.qna_id is not null;
 
+alter table status_info modify status varchar(8)
+    CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+-- insert reply table
 insert into reply (qna_id, user_id, content, reply_date)
 select distinct a.qna_id,
                 a.reply_user_id,

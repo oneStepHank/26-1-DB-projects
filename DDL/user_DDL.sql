@@ -1,5 +1,7 @@
-use _S22100229_DB;
+# use _S22100229_DB;
 
+
+use Team25;
 create table user(
     id                    varchar(20)     primary key ,
     name                  varchar(5)         not null ,
@@ -7,14 +9,10 @@ create table user(
     institution_id        tinyint         not null,
     user_title            tinyint         not null,
     user_reg_date         date         not null,
-    isAdmin               bool     not null
+    isAdmin               bool     not null,
+    foreign key (institution_id) references institution_info(id),
+    foreign key (user_title) references user_title_info(title_id)
 );
-
-alter table user
-add constraint foreign key (institution_id) references institution_info(id);
-
-alter table user
-    add constraint foreign key (user_title) references user_title_info(title_id);
 
 
 create table institution_info(
@@ -22,13 +20,14 @@ create table institution_info(
     name char(5) not null
 );
 
+
 create table user_title_info(
     title_id tinyint primary key,
     title varchar(4) not null
 );
 
 create table saved_doc(
-    has_key varchar(32) not null,
+    has_key bigint unsigned not null,
     user_id varchar(20) not null,
     saved_date date not null,
 
@@ -70,6 +69,13 @@ from Problem26.allrecords a
     join institution_info inst on inst.name = a.institution
     join user_title_info title_info on title_info.title = a.user_title
 where a.id is not null ;
+
+-- encoding 방식 문제 해결
+ALTER TABLE Team25.institution_info
+    MODIFY name char(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+
+ALTER TABLE Team25.user_title_info
+    MODIFY title varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
 
 insert into saved_doc (has_key, user_id, saved_date)
 select distinct a.saved_doc_hash_key, a.user_id, a.saved_date

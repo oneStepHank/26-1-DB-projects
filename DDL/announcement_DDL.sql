@@ -1,4 +1,4 @@
-use _S22100229_DB;
+use Team25;
 
 # select distinct announcement_id, announcement_content, announcement, announcement_user_id,
 #                 announcement_mod_date, announcement_reg_date, is_main_announce
